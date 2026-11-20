@@ -49,7 +49,47 @@ const DEFAULT_ANSWERS = [
   ['一半一半', 'maybe', '概率 可能 会不会 赌 选择 风险'],
   ['静候佳音', 'maybe', '等 结果 消息 通知 希望 考试'],
   ['换个角度想想', 'maybe', '怎么办 角度 思路 困惑 卡住 方法'],
-  ['天机不可泄露', 'maybe', '命 天意 为什么 神秘 未来 结果']
+  ['天机不可泄露', 'maybe', '命 天意 为什么 神秘 未来 结果'],
+
+  // ===== 扩充答案（v2）=====
+  ['大胆去做，别回头', 'yes', '行动 尝试 冒险 开始 决定 去吗 跳槽'],
+  ['你会得到惊喜', 'yes', '结果 期待 礼物 惊喜 消息 愿望'],
+  ['答案就在眼前', 'yes', '寻找 答案 困惑 迷茫 发现 真相'],
+  ['坚持住，胜利在望', 'yes', '坚持 努力 困难 结果 成功 加油'],
+  ['运势对你有利', 'yes', '时机 现在 机会 运势 运气 开始'],
+  ['是的，而且会更好', 'yes', '能不能 会不会 结果 未来 期待 更好'],
+  ['放手一搏吧', 'yes', '赌 冒险 决定 尝试 跳槽 创业 表白'],
+  ['你比想象中更强', 'yes', '能力 自信 怀疑 能否 困难 挑战'],
+  ['缘分正在靠近', 'yes', '缘分 感情 桃花 对象 喜欢 遇见'],
+  ['财运即将转好', 'yes', '钱 财运 收入 投资 赚钱 加薪 生意'],
+  ['会有人帮你一把', 'yes', '帮助 帮忙 贵人 支持 靠山 协助'],
+  ['尽管去争取', 'yes', '争取 机会 竞争 面试 升职 申请 努力'],
+
+  ['现在别冲动', 'no', '冲动 急 生气 决定 表态 行动 忍'],
+  ['这条路有风险', 'no', '风险 危险 投资 赌 创业 决定 冒险'],
+  ['结果会让你失望', 'no', '结果 期待 消息 考试 等 希望'],
+  ['别太高估把握', 'no', '把握 概率 机会 成功 自信 难度'],
+  ['为时尚早', 'no', '时候 现在 急 等 时机 准备 早'],
+  ['你可能会后悔', 'no', '后悔 决定 该不该 要不要 冲动 冒险'],
+  ['不是你的，别强求', 'no', '缘分 感情 属于 强求 前任 复合'],
+  ['钱袋子捂紧点', 'no', '钱 财运 投资 花钱 借钱 生意 消费'],
+  ['别被表象迷惑', 'no', '真相 表面 欺骗 判断 相信 人 看人'],
+  ['计划赶不上变化', 'no', '计划 安排 项目 未来 变化 决定'],
+  ['退一步海阔天空', 'no', '冲突 争执 矛盾 关系 让步 吵架 人际'],
+  ['你其实早有答案', 'no', '纠结 犹豫 该不该 决定 心 直觉'],
+
+  ['答案随风而变', 'maybe', '变化 未来 结果 变数 不确定 发展'],
+  ['再给自己一点时间', 'maybe', '等 时间 时候 准备 慢慢 成长 急'],
+  ['看你怎么选', 'maybe', '选择 决定 该不该 要不要 自己 主动'],
+  ['吉凶未卜', 'maybe', '结果 未来 命运 赌 冒险 考试'],
+  ['保持平常心', 'maybe', '心态 紧张 焦虑 考试 面试 结果 平常'],
+  ['事情会有转机', 'maybe', '转机 结果 困难 卡住 低谷 变化 希望'],
+  ['答案藏在你的行动里', 'maybe', '行动 做 尝试 开始 怎么办 努力'],
+  ['这次要看运气', 'maybe', '运气 概率 命运 赌 抽 随机 机会'],
+  ['先听听别人怎么说', 'maybe', '建议 意见 商量 别人 咨询 该不该'],
+  ['一切都还不确定', 'maybe', '结果 未来 现在 确定 变化 发展 等'],
+  ['放下执念，答案自现', 'maybe', '执念 放 纠结 想太多 强求 缘分'],
+  ['答案不止一个', 'maybe', '选择 可能 方法 怎么办 思路 多条路']
 ].map(([t, k, tags]) => ({ t, k, w: 1, tags: parseTags(tags), learned: [] }));
 
 const TYPE_LABEL = { yes: '肯定', no: '否定', maybe: '模糊' };
@@ -58,6 +98,7 @@ const W_MIN = 0.25, W_MAX = 3.5;
 const W_STEP = 0.3;
 const HISTORY_MAX = 60;
 const RECENT_MAX = 10;   // unique 模式：最近这么多条内不重复
+const ANSWERS_VERSION = 2; // 答案库版本：升级时自动补进新增的默认答案
 const STOP_WORDS = new Set(['吗','呢','吧','啊','哦','嗯','我','你','他','她','它','我们','你们','他们','这个','那个','什么','怎么','为什么','怎么办','是否','可以','应该','要不要','会不会','能不能','是不是','该不该','有没有','现在','今天','明天','以后','未来','一个','真的','到底','还是','或者','就是','觉得','想问','请问','告诉','答案']);
 
 function defaultSettings() {
@@ -68,6 +109,8 @@ function defaultSettings() {
     subTitle: '在心中默念你的问题，然后翻开它',
     coverTitle: '答案之书',
     answers: DEFAULT_ANSWERS.map(a => ({ ...a, tags: [...a.tags], learned: [] })),
+    answersVersion: ANSWERS_VERSION,
+    removedDefaults: [],  // 用户删掉的默认答案文本，升级时不再补回
     sound: true,
     stars: true,
     showQuestion: true,
@@ -241,6 +284,26 @@ function normalizeHistory(h) {
   }));
 }
 
+// 答案库版本升级：把新版新增的默认答案补进来
+// 不覆盖用户改过文案的答案，也不恢复用户主动删掉的默认答案
+function upgradeAnswers(cfg) {
+  cfg.removedDefaults = Array.isArray(cfg.removedDefaults)
+    ? cfg.removedDefaults.filter(x => typeof x === 'string') : [];
+  const v = Number.isFinite(Number(cfg.answersVersion)) ? Number(cfg.answersVersion) : 1;
+  if (v < ANSWERS_VERSION && Array.isArray(cfg.answers)) {
+    const texts = new Set(cfg.answers.map(a => a.t));
+    const removed = new Set(cfg.removedDefaults);
+    DEFAULT_ANSWERS.forEach(a => {
+      if (!texts.has(a.t) && !removed.has(a.t)) {
+        cfg.answers.push({ ...a, tags: [...a.tags], learned: [] });
+        texts.add(a.t);
+      }
+    });
+  }
+  cfg.answersVersion = ANSWERS_VERSION;
+  return cfg;
+}
+
 function loadSettings() {
   const base = defaultSettings();
   try {
@@ -249,6 +312,7 @@ function loadSettings() {
     const saved = JSON.parse(raw);
     const merged = { ...base, ...saved };
     merged.answers = normalizeAnswers(merged.answers, base.answers);
+    upgradeAnswers(merged);
     merged.history = normalizeHistory(merged.history);
     if (!THEMES.some(t => t.id === merged.theme)) merged.theme = 'mystic';
     if (merged.accent !== null && !/^#[0-9a-f]{6}$/i.test(merged.accent || '')) merged.accent = null;
@@ -839,7 +903,13 @@ $('answerList').addEventListener('click', e => {
   const idx = Number(li.dataset.index);
 
   if (e.target.closest('.del')) {
+    const removed = settings.answers[idx];
     settings.answers.splice(idx, 1);
+    // 删掉的若是默认答案，记下来，避免以后版本升级时又被补回
+    if (removed && DEFAULT_ANSWERS.some(a => a.t === removed.t)) {
+      if (!Array.isArray(settings.removedDefaults)) settings.removedDefaults = [];
+      if (!settings.removedDefaults.includes(removed.t)) settings.removedDefaults.push(removed.t);
+    }
     resetBag(); saveSettings(); renderAnswers(); toast('已删除答案');
     return;
   }
@@ -859,7 +929,16 @@ $('answerList').addEventListener('click', e => {
     const commit = () => {
       if (done) return; done = true;
       const v = input.value.trim();
-      if (v) { settings.answers[idx].t = v.slice(0, 30); saveSettings(); }
+      if (v) {
+        const oldT = settings.answers[idx].t;
+        settings.answers[idx].t = v.slice(0, 30);
+        // 改过文案的默认答案：记下原文，防止升级时旧版又被加回来
+        if (oldT !== settings.answers[idx].t && DEFAULT_ANSWERS.some(a => a.t === oldT)) {
+          if (!Array.isArray(settings.removedDefaults)) settings.removedDefaults = [];
+          if (!settings.removedDefaults.includes(oldT)) settings.removedDefaults.push(oldT);
+        }
+        saveSettings();
+      }
       renderAnswers();
     };
     input.addEventListener('blur', commit);
@@ -882,6 +961,8 @@ $('answerList').addEventListener('change', e => {
 
 $('resetAnswers').addEventListener('click', () => {
   settings.answers = defaultSettings().answers;
+  settings.removedDefaults = [];
+  settings.answersVersion = ANSWERS_VERSION;
   resetBag(); saveSettings(); renderAnswers(); toast('答案库已恢复默认');
 });
 $('soundSwitch').addEventListener('change', () => { if (settings.sound !== $('soundSwitch').checked) toggleSound(); });
@@ -921,6 +1002,7 @@ $('importFile').addEventListener('change', e => {
       const base = defaultSettings();
       const fresh = { ...base, ...data };
       fresh.answers = normalizeAnswers(fresh.answers, base.answers);
+      upgradeAnswers(fresh);
       fresh.history = normalizeHistory(fresh.history);
       if (!THEMES.some(t => t.id === fresh.theme)) fresh.theme = 'mystic';
       if (fresh.accent !== null && !/^#[0-9a-f]{6}$/i.test(fresh.accent || '')) fresh.accent = null;
