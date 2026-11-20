@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="mystic">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="答案之书 · 在心中默念你的问题，翻开属于你的答案。可自由定制主题、文案与答案。仅供娱乐。" />
+  <title>答案之书 · The Book of Answers</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 星空背景 -->
+  <div class="stars" id="stars" aria-hidden="true"></div>
+  <div class="nebula" aria-hidden="true"></div>
+
+  <!-- 右上角工具 -->
+  <div class="top-tools">
+    <button class="icon-btn" id="soundToggle" aria-label="关闭音效" title="切换音效">🔊</button>
+    <button class="icon-btn" id="settingsBtn" aria-label="个性化设置" title="个性化设置">⚙</button>
+  </div>
+
+  <main class="container">
+    <header class="header">
+      <div class="eyebrow"><span>✦</span> THE BOOK OF ANSWERS <span>✦</span></div>
+      <h1 class="title" id="mainTitle">答案之书</h1>
+      <p class="subtitle" id="subTitle">在心中默念你的问题，然后翻开它</p>
+      <div class="divider"><span>☾</span></div>
+    </header>
+
+    <!-- 魔法书 -->
+    <section class="book-section" aria-label="答案之书">
+      <div class="book-glow"></div>
+      <div class="book" id="book">
+        <div class="book-page">
+          <div class="page-ornament">✧ ✦ ✧</div>
+          <p class="page-question" id="pageQuestion"></p>
+          <div class="answer" id="answer">…</div>
+          <p class="page-hint">— 星辰已给出指引 —</p>
+        </div>
+        <div class="book-cover">
+          <div class="cover-border">
+            <div class="cover-moon">☾</div>
+            <div class="cover-title" id="coverTitle">答案之书</div>
+            <div class="cover-sub">ORACLE</div>
+            <div class="cover-stars">✦ &nbsp; ✧ &nbsp; ✦</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 控制台 -->
+    <section class="controls" id="controls">
+      <input
+        id="questionInput"
+        class="question-input"
+        type="text"
+        maxlength="60"
+        placeholder="写下你的问题（也可以只在心里想）…"
+        autocomplete="off"
+      />
+      <button class="reveal-btn" id="revealBtn">
+        <span class="btn-icon">✦</span> 翻开答案
+      </button>
+    </section>
+
+    <p class="status" id="status" aria-live="polite"></p>
+    <p class="match-hint" id="matchHint"></p>
+
+    <!-- 反馈条：答案揭晓后出现 -->
+    <div class="feedback-bar" id="feedbackBar" hidden>
+      <span class="feedback-label">这个答案说中你了吗？</span>
+      <button class="fb-btn" id="fbUp" aria-label="满意">✓ 满意</button>
+      <button class="fb-btn" id="fbDown" aria-label="不满意">✕ 不满意</button>
+    </div>
+
+    <footer class="footer">
+      <span>✦</span> 仅供娱乐 · 答案或许就在你心里 <span>✦</span>
+    </footer>
+  </main>
+
+  <!-- ============ 个性化设置抽屉 ============ -->
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="个性化设置" aria-hidden="true">
+    <header class="drawer-head">
+      <h2>✦ 个性化设置</h2>
+      <button class="drawer-close" id="closeDrawer" aria-label="关闭设置">✕</button>
+    </header>
+
+    <div class="drawer-body">
+      <section class="set-section">
+        <h3>主题风格</h3>
+        <div class="theme-grid" id="themeGrid"></div>
+      </section>
+
+      <section class="set-section">
+        <h3>自定义强调色 <small>选「跟随主题」可还原</small></h3>
+        <div class="color-row">
+          <input type="color" id="accentColor" value="#e8c977" aria-label="选择强调色" />
+          <span class="color-value" id="accentValue">跟随主题</span>
+          <button class="mini-btn" id="resetAccent">跟随主题</button>
+        </div>
+      </section>
+
+      <section class="set-section">
+        <h3>专属文案</h3>
+        <label class="field">主标题<input id="mainTitleInput" type="text" maxlength="12" /></label>
+        <label class="field">副标题<input id="subTitleInput" type="text" maxlength="40" /></label>
+        <label class="field">封面文字<input id="coverTitleInput" type="text" maxlength="12" /></label>
+        <button class="mini-btn" id="resetText">恢复默认文案</button>
+      </section>
+
+      <section class="set-section">
+        <h3>我的答案库 <small id="answerCount"></small></h3>
+        <p class="hint" style="margin:0 0 10px">每条答案可设置「适用词」（点答案右侧的 ⚑），问题里出现这些词时更容易翻到它。文件末尾的「关联」列会显示效果。</p>
+        <div class="filter-row" id="filterRow">
+          <button class="chip active" data-filter="all">全部</button>
+          <button class="chip" data-filter="yes">肯定</button>
+          <button class="chip" data-filter="no">否定</button>
+          <button class="chip" data-filter="maybe">模糊</button>
+        </div>
+        <ul class="answer-list" id="answerList"></ul>
+        <div class="add-row">
+          <select id="newAnswerType" aria-label="答案类型">
+            <option value="yes">肯定</option>
+            <option value="no">否定</option>
+            <option value="maybe">模糊</option>
+          </select>
+          <input id="newAnswerInput" type="text" maxlength="30" placeholder="写一条新答案…" />
+          <button class="mini-btn primary" id="addAnswerBtn">添加</button>
+        </div>
+        <label class="field" style="margin-top:4px">新答案的适用词（用空格或逗号分隔，可留空）<input id="newAnswerTags" type="text" maxlength="80" placeholder="例如：能不能 会不会 时机 现在" /></label>
+        <button class="mini-btn" id="resetAnswers">恢复默认答案</button>
+      </section>
+
+      <section class="set-section">
+        <h3>体验开关</h3>
+        <label class="switch"><input type="checkbox" id="soundSwitch" /><span></span>揭晓音效</label>
+        <label class="switch"><input type="checkbox" id="starSwitch" /><span></span>星空闪烁</label>
+        <label class="switch"><input type="checkbox" id="questionSwitch" /><span></span>显示问题输入框</label>
+        <label class="switch"><input type="checkbox" id="adaptiveSwitch" /><span></span>按反馈自适应答案权重</label>
+        <label class="switch"><input type="checkbox" id="matchSwitch" /><span></span>按问题内容匹配答案</label>
+        <label class="switch"><input type="checkbox" id="uniqueSwitch" /><span></span>抽过的答案不再重复</label>
+      </section>
+
+      <section class="set-section" id="memorySection">
+        <h3>记忆与自适应 <small id="memoryStat"></small></h3>
+        <div class="bias-box" id="biasBox"></div>
+        <p class="hint" id="adaptiveHint">每次你给出「满意 / 不满意」，它会悄悄调整答案出现的概率，越用越懂你。偏好只保存在你的浏览器里。</p>
+        <div class="history-head">
+          <span>近期问答</span>
+          <button class="mini-btn danger" id="clearMemoryBtn">清除记忆</button>
+        </div>
+        <ul class="history-list" id="historyList"></ul>
+      </section>
+
+      <section class="set-section">
+        <h3>备份与分享</h3>
+        <div class="backup-row">
+          <button class="mini-btn" id="exportBtn">导出配置</button>
+          <button class="mini-btn" id="importBtn">导入配置</button>
+          <input type="file" id="importFile" accept="application/json,.json" hidden />
+        </div>
+        <button class="mini-btn danger" id="resetAllBtn">恢复全部默认</button>
+        <p class="hint">设置自动保存在当前浏览器；导出配置可分享给朋友或换设备使用。</p>
+      </section>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
